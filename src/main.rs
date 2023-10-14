@@ -2,10 +2,12 @@ use std::io;
 
 fn main()
 {
-    fact();
+    let facVec = fact();
+    println!("{:?}", circum_lattice_points_origin(facVec.clone()));
+    println!("{:?}", circum_lattice_points_halfx(facVec));
 }
 
-fn fact()
+fn fact() -> Vec<u64>
 {
     let mut input = String::new();
 
@@ -16,11 +18,12 @@ fn fact()
     let trimmed = input.trim();
     match trimmed.parse::<u64>()
     {
-        Ok(i) => println!("{:?}", circum_lattice_points_origin(factors(i))),
+        Ok(i) =>  return factors(i),
         Err(..) => println!("this was not an integer: {}", trimmed),
     };
+    return vec![];
 }
-
+//***(0, 0) Code***
 fn circum_lattice_points_origin(vec: Vec<u64>) -> u64
 {
     let mut r = 1;
@@ -59,6 +62,26 @@ pub fn factors(mut n: u64) -> Vec<u64>
     }
     
     factors
+}
+//***(1/2, 0) Code***
+fn int_sided_rtriangles(vec: Vec<u64>) -> u64
+{
+    let mut total = 1;
+    let mut i = 0;
+    while i < vec.len()
+    {
+        if vec[i] & 3 == 1
+        {
+            total *= (i + 1) + 1;
+        }
+        i += 2;
+    }
+    return (total>>1).try_into().unwrap();
+}
+
+fn circum_lattice_points_halfx(vec: Vec<u64>) -> u64
+{
+    return 4 * (int_sided_rtriangles(vec)) + 2;
 }
 
 //***This code is no longer in use***
