@@ -2,12 +2,72 @@ use std::io;
 
 fn main()
 {
-    let facVec = fact();
-    println!("{:?}", circum_lattice_points_origin(facVec.clone()));
-    println!("{:?}", circum_lattice_points_halfx(facVec));
+    manage_first_input();
 }
 
-fn fact() -> Vec<u64>
+fn manage_first_input()
+{
+    println!("Welcome! Type 'in' (without the quotes) to calculate the number of lattice points in a circle.");
+    println!("Alternatively, type 'circumference' to calculate the number of points on a circle's circumference");
+    let mut first_input = String::new();
+    io::stdin()
+        .read_line(&mut first_input)
+        .expect("Failed to read line");
+        
+    println!("{:?}", first_input);
+    if first_input == ("in\r\n")
+    {
+        println!("Do you want the circle centered at x = 0 or x = 1/2? (y = 0 for both)");
+        let mut second_input = String::new();
+        io::stdin()
+            .read_line(&mut second_input)
+            .expect("Failed to read line");
+            if second_input == ("0\r\n")
+            {
+                println!("WARNING: Not recommended to go above 1,000,000 due to processing time (unless you're patient)");
+                println!("Origin it is");
+                println!("What radius circle?");
+                let val = input_value();
+                println!("Total lattice points in the circle: {:?}", origin_sum_below(val.clone()));
+            }
+            else
+            {
+                println!("WARNING: Not recommended to go above 1,000,000 due to processing time (unless you're patient)");
+                println!("1/2 then!");
+                println!("What radius circle?");
+                let val = input_value() * 2 + 1;
+                println!("Total lattice points on the circumference: {:?}", half_sum_below(val.clone()));
+            }
+    }
+    if first_input == ("circumference\r\n")
+    {
+        println!("Do you want the circle centered at x = 0 or x = 1/2? (y = 0 for both)");
+        let mut second_input = String::new();
+        io::stdin()
+            .read_line(&mut second_input)
+            .expect("Failed to read line");
+            if second_input == ("0\r\n")
+            {
+                println!("WARNING: Not recommended to go above 1,000,000 due to processing time (unless you're patient)");
+                println!("Origin it is");
+                println!("What radius circle?");
+                let val = input_value();
+                let fac_vec = factors(val.clone());
+                println!("Total lattice points on the circumference: {:?}", circum_lattice_points_origin(fac_vec.clone()));
+            }
+            else
+            {
+                println!("WARNING: Not recommended to go above 1,000,000 due to processing time (unless you're patient)");
+                println!("1/2 then!");
+                println!("What radius circle?");
+                let val = input_value() * 2 + 1;
+                let fac_vec = factors(val.clone());
+                println!("Total lattice points on the circumference: {:?}", circum_lattice_points_halfx(fac_vec.clone()));
+            }
+    }
+}
+
+fn input_value() -> u64
 {
     let mut input = String::new();
 
@@ -18,11 +78,36 @@ fn fact() -> Vec<u64>
     let trimmed = input.trim();
     match trimmed.parse::<u64>()
     {
-        Ok(i) =>  return factors(i),
+        Ok(i) =>  return i,
         Err(..) => println!("this was not an integer: {}", trimmed),
     };
-    return vec![];
+    return 1;
 }
+
+fn origin_sum_below(num: u64) -> u64
+{
+    let mut total_pts = 0;
+    let mut i = num;
+    while i > 0
+    {
+        total_pts += circum_lattice_points_origin(factors(i));
+        i -= 1;
+    }
+    return total_pts;
+}
+
+fn half_sum_below(num: u64) -> u64
+{
+    let mut total_pts = 0;
+    let mut i = num;
+    while i > 0
+    {
+        total_pts += circum_lattice_points_halfx(factors(i));
+        i -= 1;
+    }
+    return total_pts;
+}
+
 //***(0, 0) Code***
 fn circum_lattice_points_origin(vec: Vec<u64>) -> u64
 {
@@ -42,14 +127,29 @@ fn circum_lattice_points_origin(vec: Vec<u64>) -> u64
 pub fn factors(mut n: u64) -> Vec<u64> 
 {
     let mut factors = vec![];
-    let mut x = 1;
+    let mut x = 2;
 
-    while n > 1 
+    let mut i = 0;
+
+    // This makes it uglier, but we can skip all odd numbers now
+    while n % x == 0 
     {
-        x += 1;
+        n /= x;
+        i += 1;
+    }
+    if i > 0
+    {
+        factors.push(x);
+        factors.push(i);
+    }
+    x += 1;
+    
+    // If it has exceeded the sqrt of n then n is a prime
+    while n > 1 && x < ((n as f64).sqrt().round() as u64) + 1
+    {
         let mut i = 0;
 
-        while n % x == 0 
+        while n % x == 0
         {
             n /= x;
             i += 1;
@@ -59,6 +159,7 @@ pub fn factors(mut n: u64) -> Vec<u64>
             factors.push(x);
             factors.push(i);
         }
+        x += 2;
     }
     
     factors
@@ -72,7 +173,7 @@ fn int_sided_rtriangles(vec: Vec<u64>) -> u64
     {
         if vec[i] & 3 == 1
         {
-            total *= (i + 1) + 1;
+            total *= vec[i + 1] + 1;
         }
         i += 2;
     }
@@ -82,30 +183,4 @@ fn int_sided_rtriangles(vec: Vec<u64>) -> u64
 fn circum_lattice_points_halfx(vec: Vec<u64>) -> u64
 {
     return 4 * (int_sided_rtriangles(vec)) + 2;
-}
-
-//***This code is no longer in use***
-pub fn factors2_d(mut n: u64) -> Vec<Vec<u64>> 
-{
-    let mut factors = vec![];
-    let mut x = 1;
-
-    while n > 1 
-    {
-        x += 1;
-        let mut i = 0;
-
-        while n % x == 0 
-        {
-            n /= x;
-            i += 1;
-        }
-        let vec = vec![x, i];
-        if i > 0
-        {
-            factors.push(vec);
-        }
-    }
-    
-    factors
 }
