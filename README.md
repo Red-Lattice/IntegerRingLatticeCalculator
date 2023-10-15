@@ -1,7 +1,8 @@
-# MasserGramainConstantCalculator
-The Masser-Gramain constant is a very mysterious number in math. Only 4 digits are known due to the difficulty of calculation.
+# IntegerRingLatticeCalculator
+This program calculates, for a given circle of integer radius n, how many lattice points lie on the circumference of that circle.
 
-This is a program that once finished is meant to calculate it. It's far from finished though.
+A lattice point is defined as a point (s, t) on the coordinate plane such that s and t are integers
 
-The program is going to rely on a conjectured theory of mine that all theoretically perfect circles used to calculate it lie with their centers on (0, 0), (1/2, 0), or (1/2, 1/2).
-I have no proof for this but it seems intuitively right
+It works for circles centered at (n, n) and (n + 0.5, n) for some integer n - which are equivalent to the disks centered at (0, 0) and (0.5, 0)
+
+Feel free to use this however you want
