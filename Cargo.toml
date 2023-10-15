@@ -9,4 +9,5 @@ edition = "2021"
 factor = "0.4.0"
 fixed = "1.24.0"
 fixed-sqrt = "0.2.5"
+num-bigfloat = "1.7.0"
 
